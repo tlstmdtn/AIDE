@@ -29,45 +29,14 @@ test("curriculum tabs and FAQ expose the requested content", async ({
   expect(errors).toEqual([]);
 });
 
-test("application drafts persist, download, restore and can be deleted", async ({
-  page,
-}) => {
+test("application links navigate to a separate page", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "참여 신청", exact: true }).click();
-  await expect(page.getByRole("dialog")).toBeVisible();
-  await page.getByLabel("이름", { exact: true }).fill("테스트 참여자");
-  await page
-    .getByLabel("이메일", { exact: true })
-    .fill("participant@example.com");
-  await page
-    .getByLabel("만들고 싶은 웹사이트", { exact: true })
-    .fill("좋아하는 전시를 모아보는 웹사이트");
-  await page.getByRole("button", { name: "신청서 저장하기" }).click();
-  await expect(page.getByRole("dialog")).toContainText(
-    "아직 스터디 접수가 완료된 것은 아니에요.",
-  );
-  const downloadPromise = page.waitForEvent("download");
-  await page.getByRole("button", { name: "신청서 다운로드" }).click();
-  const download = await downloadPromise;
-  expect(download.suggestedFilename()).toBe("AIDE-신청서.txt");
-  await page.keyboard.press("Escape");
-  await expect(page.getByRole("dialog")).toBeHidden();
+  await page.getByRole("link", { name: "참여 신청", exact: true }).click();
+  await expect(page).toHaveURL(/\/apply\/$/);
   await expect(
-    page.getByRole("button", { name: "참여 신청", exact: true }),
-  ).toBeFocused();
-  await page.reload();
-  await page.getByRole("button", { name: "참여 신청", exact: true }).click();
-  await expect(page.getByLabel("이름", { exact: true })).toHaveValue(
-    "테스트 참여자",
-  );
-  await expect(
-    page.getByLabel("만들고 싶은 웹사이트", { exact: true }),
-  ).toHaveValue("좋아하는 전시를 모아보는 웹사이트");
-  await page.getByRole("button", { name: "저장된 내용 삭제하기" }).click();
-  await expect(page.getByLabel("이름", { exact: true })).toHaveValue("");
-  expect(
-    await page.evaluate(() => localStorage.getItem("aide-application")),
-  ).toBeNull();
+    page.getByRole("heading", { name: "먼저, 당신을 소개해 주세요." }),
+  ).toBeVisible();
+  await expect(page.getByLabel("이름 / 나이", { exact: false })).toBeVisible();
 });
 
 test("project details and contact dialog work with keyboard navigation", async ({
@@ -82,7 +51,7 @@ test("project details and contact dialog work with keyboard navigation", async (
   await expect(
     page
       .getByRole("dialog")
-      .getByRole("button", { name: "나의 아이디어 시작하기" }),
+      .getByRole("link", { name: "나의 아이디어 시작하기" }),
   ).toBeFocused();
   await page.keyboard.press("Tab");
   await expect(
@@ -118,9 +87,9 @@ test("mobile navigation, sections and form fit the viewport", async ({
     expect(overflows, `No horizontal overflow at ${width}px`).toBe(false);
   }
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.getByRole("button", { name: "참여 신청", exact: true }).click();
-  await expect(page.getByRole("dialog")).toBeVisible();
-  const rect = await page.getByRole("dialog").boundingBox();
+  await page.getByRole("link", { name: "참여 신청", exact: true }).click();
+  await expect(page.locator(".application-form-section")).toBeVisible();
+  const rect = await page.locator(".application-form-section").boundingBox();
   expect(rect.x).toBeGreaterThanOrEqual(0);
   expect(rect.x + rect.width).toBeLessThanOrEqual(390);
 });

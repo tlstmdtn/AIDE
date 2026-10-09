@@ -19,6 +19,9 @@ html {
 }
 body {
   margin: 0;
+  background: #08090b;
+}
+main {
   background: #fff;
 }
 button,
@@ -192,7 +195,16 @@ h2 {
 .skip-link:focus {
   top: 10px;
 }
+.route-loading {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  background: #08090b;
+  color: #a7bce0;
+  font-size: 13px;
+}
 .header {
+  --header-tint: rgb(8 9 11 / 45%);
   position: fixed;
   top: 0;
   left: 0;
@@ -202,19 +214,31 @@ h2 {
   padding-top: var(--safe-area-top);
   padding-left: env(safe-area-inset-left, 0px);
   padding-right: env(safe-area-inset-right, 0px);
-  background: rgb(8 9 11 / 45%);
+  isolation: isolate;
+  border-bottom: 1px solid #ffffff12;
+  transition: border-color 0.3s;
+}
+.header::before {
+  content: "";
+  position: absolute;
+  /* Paint beyond the viewport: Safari can expose page content behind its toolbar,
+     including when safe-area-inset-top is zero in an in-app browser. */
+  inset: calc(-1 * max(160px, var(--safe-area-top))) 0 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--header-tint);
   -webkit-backdrop-filter: blur(22px) saturate(140%);
   backdrop-filter: blur(22px) saturate(140%);
-  border-bottom: 1px solid #ffffff12;
-  transition: background 0.3s, border-color 0.3s;
+  transition: background 0.3s;
 }
 .header.scrolled {
-  background: rgb(10 11 14 / 65%);
+  --header-tint: rgb(10 11 14 / 65%);
   border-bottom-color: #ffffff1c;
 }
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .header,
-  .header.scrolled {
+@supports not (
+  (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+) {
+  .header::before {
     background: #0a0b0ef5;
   }
 }

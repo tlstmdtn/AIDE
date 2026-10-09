@@ -21,10 +21,12 @@ import {
   MapPin,
   Users,
   CalendarDays,
-  Download,
-  Copy,
 } from "lucide-react";
 import "./styles.css";
+
+const APPLICATION_URL = `${import.meta.env.BASE_URL}apply/`;
+const ApplicationPage = React.lazy(() => import("./pages/ApplicationPage"));
+const AdminPage = React.lazy(() => import("./pages/AdminPage"));
 
 const weeks = [
   {
@@ -402,156 +404,6 @@ function Modal({ title, children, onClose }) {
   );
 }
 
-function Application({ onClose }) {
-  const [form, setForm] = useState(() => {
-    try {
-      return (
-        JSON.parse(localStorage.getItem("aide-application")) || {
-          name: "",
-          email: "",
-          idea: "",
-        }
-      );
-    } catch {
-      return { name: "", email: "", idea: "" };
-    }
-  });
-  const [saved, setSaved] = useState(false);
-  const [storageError, setStorageError] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const applicationText = `AIDE 스터디 신청서\n\n이름: ${form.name}\n이메일: ${form.email}\n만들고 싶은 웹사이트:\n${form.idea}\n\n※ 공식 접수 전 작성한 신청서입니다.`;
-  function save(e) {
-    e.preventDefault();
-    try {
-      localStorage.setItem("aide-application", JSON.stringify(form));
-      setStorageError(false);
-    } catch {
-      setStorageError(true);
-    }
-    setSaved(true);
-  }
-  function download() {
-    const url = URL.createObjectURL(
-      new Blob([applicationText], { type: "text/plain;charset=utf-8" }),
-    );
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "AIDE-신청서.txt";
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  }
-  return (
-    <Modal
-      title={saved ? "첫걸음을 준비했어요." : "어떤 아이디어를 만들고 싶나요?"}
-      onClose={onClose}
-    >
-      {saved ? (
-        <div className="application-success">
-          <div className="success-icon">
-            <Check />
-          </div>
-          <p>
-            {storageError
-              ? "브라우저에 저장하지 못했어요. 아래 버튼으로 신청서를 다운로드해 주세요."
-              : "신청서가 이 브라우저에 저장되었어요."}
-            <br />
-            <strong>아직 스터디 접수가 완료된 것은 아니에요.</strong>
-          </p>
-          <p className="modal-note">
-            공식 신청 링크가 공개되면 작성한 내용으로 접수해 주세요. 저장된
-            내용은 이 기기에서 다시 확인하고 수정할 수 있어요.
-          </p>
-          <div className="application-actions">
-            <button className="button button-blue" onClick={download}>
-              <Download size={16} /> 신청서 다운로드
-            </button>
-            <button
-              className="button button-light"
-              onClick={async () => {
-                try {
-                  await navigator.clipboard.writeText(applicationText);
-                  setCopied(true);
-                } catch {
-                  download();
-                }
-              }}
-            >
-              <Copy size={16} />
-              {copied ? "복사 완료" : "복사하기"}
-            </button>
-          </div>
-          <button className="text-button" onClick={() => setSaved(false)}>
-            작성 내용 수정하기 <ArrowRight size={14} />
-          </button>
-        </div>
-      ) : (
-        <form onSubmit={save} className="application-form">
-          <p className="modal-note">
-            나만의 웹사이트를 만드는 3주, AIDE와 함께 시작해요.
-            <br />
-            공식 신청 링크는 준비 중이며, 지금은 신청서를 미리 작성하고 기기에
-            저장할 수 있어요.
-          </p>
-          <label>
-            이름
-            <input
-              required
-              autoComplete="name"
-              maxLength={50}
-              placeholder="이름을 입력해 주세요"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-            />
-          </label>
-          <label>
-            이메일
-            <input
-              required
-              type="email"
-              autoComplete="email"
-              maxLength={120}
-              placeholder="hello@example.com"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-            />
-          </label>
-          <label>
-            <span id="application-idea-label">만들고 싶은 웹사이트</span>
-            <textarea
-              aria-labelledby="application-idea-label"
-              required
-              maxLength={2000}
-              rows={4}
-              placeholder="아직 막연한 아이디어여도 괜찮아요."
-              value={form.idea}
-              onChange={(e) => setForm({ ...form, idea: e.target.value })}
-            />
-          </label>
-          <p className="privacy-note">
-            입력 내용은 이 기기에만 저장됩니다. 공용 기기에서는 다운로드 후
-            아래의 저장 내용 삭제 기능을 이용해 주세요.
-          </p>
-          <button className="button button-blue form-submit" type="submit">
-            신청서 저장하기 <ArrowRight size={16} />
-          </button>
-          <button
-            className="text-button clear-data"
-            type="button"
-            onClick={() => {
-              try {
-                localStorage.removeItem("aide-application");
-              } catch {}
-              setForm({ name: "", email: "", idea: "" });
-            }}
-          >
-            저장된 내용 삭제하기
-          </button>
-        </form>
-      )}
-    </Modal>
-  );
-}
-
 function App() {
   const [week, setWeek] = useState(0);
   const [faq, setFaq] = useState(null);
@@ -606,9 +458,9 @@ function App() {
             ))}
           </nav>
           <div className="nav-actions">
-            <button className="nav-apply" onClick={() => setModal("apply")}>
+            <a className="nav-apply" href={APPLICATION_URL}>
               참여 신청 <ArrowUpRight size={14} />
-            </button>
+            </a>
             <button
               className="menu-toggle icon-button"
               aria-label={mobileOpen ? "메뉴 닫기" : "메뉴 열기"}
@@ -649,12 +501,9 @@ function App() {
               <br />
               AI와 함께 나만의 웹사이트를 완성하는 3주, <strong>AIDE.</strong>
             </p>
-            <button
-              className="button button-white hero-cta"
-              onClick={() => setModal("apply")}
-            >
+            <a className="button button-white hero-cta" href={APPLICATION_URL}>
               나의 아이디어 시작하기 <ArrowUpRight size={18} />
-            </button>
+            </a>
             <div className="hero-caption">
               <Sparkles size={14} className="tiny-star" /> 경험보다 중요한 건,
               만들고 싶은 마음.
@@ -1011,12 +860,9 @@ function App() {
                   <br />
                   AIDE에서 시작하세요.
                 </h3>
-                <button
-                  className="button button-white"
-                  onClick={() => setModal("apply")}
-                >
+                <a className="button button-white" href={APPLICATION_URL}>
                   함께 만들어볼까요? <ArrowUpRight size={18} />
-                </button>
+                </a>
                 <span className="banner-note">
                   3주 뒤, 아이디어는 하나의 링크가 됩니다.
                 </span>
@@ -1102,7 +948,6 @@ function App() {
           </div>
         </div>
       </footer>
-      {modal === "apply" && <Application onClose={closeModal} />}
       {typeof modal === "number" && (
         <Modal title={projects[modal].name} onClose={closeModal}>
           <ProjectVisual type={projects[modal].type} />
@@ -1115,12 +960,9 @@ function App() {
               </li>
             ))}
           </ul>
-          <button
-            className="button button-blue"
-            onClick={() => setModal("apply")}
-          >
+          <a className="button button-blue" href={APPLICATION_URL}>
             나의 아이디어 시작하기 <ArrowUpRight size={16} />
-          </button>
+          </a>
         </Modal>
       )}
       {modal === "contact" && (
@@ -1138,4 +980,22 @@ function App() {
   );
 }
 
-createRoot(document.getElementById("root")).render(<App />);
+const path = window.location.pathname
+  .replace(/\/index\.html$/, "")
+  .replace(/\/$/, "");
+const Page = path.endsWith("/apply")
+  ? ApplicationPage
+  : path.endsWith("/admin")
+    ? AdminPage
+    : App;
+createRoot(document.getElementById("root")).render(
+  <React.Suspense
+    fallback={
+      <div className="route-loading" role="status">
+        AIDE 페이지를 불러오고 있어요.
+      </div>
+    }
+  >
+    <Page />
+  </React.Suspense>,
+);
