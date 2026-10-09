@@ -29,6 +29,39 @@ export const blankApplication = {
   contact: "",
 };
 
+export async function checkIntakeReady() {
+  if (!supabase) return "unconfigured";
+  // The migration rejects this request before any insert. Verify the real RPC
+  // without creating a test application or reading anyone's personal data.
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
+  try {
+    const { error } = await supabase
+      .rpc("submit_application", {
+        p_request_id: null,
+        p_name_age: "",
+        p_university_major: "",
+        p_ai_tools: [],
+        p_ai_other: "",
+        p_motivation: "",
+        p_residence: "",
+        p_contact: "",
+        p_consent: false,
+      })
+      .abortSignal(controller.signal);
+    if (
+      error?.code === "22023" &&
+      error.message === "Valid request and consent are required"
+    )
+      return "ready";
+    if (error?.code === "PGRST202" || error?.code === "42P01")
+      return "unavailable";
+    return "offline";
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 export function validateStep(step, form, consent = false) {
   const errors = {};
   if (step === 0) {

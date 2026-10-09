@@ -53,6 +53,25 @@ after(async () => {
   await db?.close();
 });
 
+test("readiness probe returns the expected validation error without saving an application", async () => {
+  await db.exec("set role anon");
+  try {
+    await assert.rejects(
+      submit([null, "", "", [], "", "", "", "", false]),
+      (error) =>
+        error.code === "22023" &&
+        error.message === "Valid request and consent are required",
+    );
+  } finally {
+    await db.exec("reset role");
+  }
+  assert.equal(
+    (await db.query("select count(*)::int as count from applications")).rows[0]
+      .count,
+    0,
+  );
+});
+
 test("anonymous submission returns a server receipt and retry does not duplicate data", async () => {
   await db.exec("set role anon");
   try {

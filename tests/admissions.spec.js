@@ -3,6 +3,27 @@ import ExcelJS from "exceljs";
 
 import { rows, mockBackend, fillApplication } from "./helpers/admissions";
 
+test("intake stays closed until the server is ready and can be retried without losing answers", async ({
+  page,
+}) => {
+  const backend = await mockBackend(page, { intakeReady: false });
+  await fillApplication(page);
+  await expect(page.getByRole("status")).toContainText("신청 접수를 준비 중");
+  await expect(
+    page.getByRole("button", { name: "제출하기", exact: true }),
+  ).toBeDisabled();
+  expect(backend.submissions).toHaveLength(0);
+  await page.unroute("https://aide-test.supabase.co/**");
+  await mockBackend(page);
+  await page.getByRole("button", { name: "연결 다시 확인" }).click();
+  await expect(
+    page.getByRole("button", { name: "제출하기", exact: true }),
+  ).toBeEnabled();
+  await expect(page.getByLabel("연락처", { exact: false })).toHaveValue(
+    "010-1234-5678",
+  );
+});
+
 test("three-step form validates fields, retains previous answers and requires other-AI text", async ({
   page,
 }) => {

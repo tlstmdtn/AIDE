@@ -27,14 +27,16 @@ values ('운영진-사용자의-UUID');
 
 프로젝트 Connect 또는 Settings → API Keys에서 Project URL과 **publishable key**를 확인합니다. 두 값은 공개 프론트엔드 설정이며 DB 관리자 비밀 키가 아닙니다. **service_role, sb_secret 키나 DB 비밀번호는 사용하면 안 됩니다.**
 
-로컬 개발은 `.env.example`을 참고해 `.env.local`에 설정합니다.
+현재 프로젝트의 공개 URL과 publishable key는 `config/admissions.public.json`에 연결되어 있습니다. 이 파일에는 프론트엔드에서 공개해도 되는 값만 포함하며 관리자용 비밀 키는 허용하지 않습니다.
+
+다른 프로젝트를 테스트할 때는 `.env.example`을 참고해 `.env.local`에 아래 두 값을 함께 설정하면 공개 기본 설정보다 우선합니다.
 
 ```dotenv
 VITE_SUPABASE_URL=https://프로젝트.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=공개_publishable_key
 ```
 
-GitHub 공개 사이트는 저장소 **Settings → Secrets and variables → Actions → Variables**에 같은 이름의 Repository variables 두 개를 등록한 뒤 배포 워크플로를 다시 실행하세요. 이 환경의 GitHub 인증은 Repository variables 목록·설정 권한이 없어 계정에서 등록해야 합니다.
+GitHub 공개 사이트도 공개 기본 설정으로 빌드됩니다. 다른 프로젝트로 재정의하려면 저장소 **Settings → Secrets and variables → Actions → Variables**에 같은 이름의 Repository variables 두 개를 함께 등록한 뒤 배포 워크플로를 다시 실행하세요. 이 환경의 GitHub 인증은 Repository variables 목록·설정 권한이 없어 해당 재정의는 계정에서 등록해야 합니다.
 
 관리자는 `https://tlstmdtn.github.io/AIDE/apply/` 상단의 AIDE 로고를 5번 눌러 이동하거나 `/AIDE/admin/`에 직접 접속할 수 있습니다. 인증 후에만 실제 신청 데이터를 불러옵니다.
 
@@ -46,4 +48,4 @@ GitHub 공개 사이트는 저장소 **Settings → Secrets and variables → Ac
 4. 비로그인·일반 계정으로 신청 목록을 읽을 수 없는지 확인합니다.
 5. 검증용 신청은 SQL Editor에서 해당 UUID만 대상으로 삭제합니다.
 
-연결 값이 없으면 사이트는 실제 접수가 준비 중임을 알리고 제출을 막습니다. 로컬 저장이나 가짜 성공 화면으로 실제 접수를 대신하지 않습니다. 테스트의 모의 API 응답은 실제 공개 DB 연결 검증이 아닙니다.
+사이트는 접수 함수에 동의하지 않은 빈 요청을 보내 데이터가 저장되기 전 거부되는지 확인합니다. 이 확인 요청은 신청 기록을 만들지 않습니다. 함수가 없거나 서버에 연결할 수 없으면 제출을 막고 연결 재확인 기능을 제공합니다. 테이블 설정 후 재확인하면 다시 배포하지 않아도 접수가 열립니다. 로컬 저장이나 가짜 성공 화면으로 실제 접수를 대신하지 않습니다. 테스트의 모의 API 응답은 실제 공개 DB 연결 검증이 아닙니다.

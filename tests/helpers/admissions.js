@@ -27,7 +27,7 @@ export const rows = [
 
 export async function mockBackend(
   page,
-  { admin = true, failFirst = false } = {},
+  { admin = true, failFirst = false, intakeReady = true } = {},
 ) {
   const submissions = [];
   let listRequests = 0;
@@ -53,6 +53,25 @@ export async function mockBackend(
     if (route.request().method() === "OPTIONS")
       return route.fulfill({ status: 204, headers });
     if (path.endsWith("/rpc/submit_application")) {
+      if (route.request().postDataJSON().p_consent === false) {
+        if (!intakeReady)
+          return route.fulfill({
+            status: 404,
+            headers,
+            body: JSON.stringify({
+              code: "PGRST202",
+              message: "Function not found",
+            }),
+          });
+        return route.fulfill({
+          status: 400,
+          headers,
+          body: JSON.stringify({
+            code: "22023",
+            message: "Valid request and consent are required",
+          }),
+        });
+      }
       submissions.push(route.request().postDataJSON());
       if (failFirst && submissions.length === 1)
         return route.fulfill({

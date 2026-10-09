@@ -297,6 +297,17 @@
   margin-top: 20px;
   word-break: keep-all;
 }
+.intake-retry {
+  display: block;
+  background: none;
+  padding: 0;
+  margin-top: 7px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #285cae;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 .step-fields {
   animation: panel-in 0.4s var(--ease);
 }

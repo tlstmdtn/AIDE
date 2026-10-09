@@ -15,6 +15,7 @@ import {
   SITE_BASE,
   admissionsConfigured,
   blankApplication,
+  checkIntakeReady,
   koreanTime,
   submitApplication,
   validateStep,
@@ -68,6 +69,10 @@ export default function ApplicationPage() {
   const [submitting, setSubmitting] = useState(false);
   const [failure, setFailure] = useState("");
   const [receipt, setReceipt] = useState(null);
+  const [intakeStatus, setIntakeStatus] = useState(
+    admissionsConfigured ? "checking" : "unconfigured",
+  );
+  const [connectionAttempt, setConnectionAttempt] = useState(0);
   const requestId = useRef(crypto.randomUUID());
   const inFlight = useRef(false);
   const heading = useRef(null);
@@ -75,6 +80,22 @@ export default function ApplicationPage() {
   const dirty = Object.values(form).some((value) =>
     Array.isArray(value) ? value.length : value.trim(),
   );
+
+  useEffect(() => {
+    if (!admissionsConfigured) return;
+    let active = true;
+    setIntakeStatus("checking");
+    checkIntakeReady()
+      .then((status) => {
+        if (active) setIntakeStatus(status);
+      })
+      .catch(() => {
+        if (active) setIntakeStatus("offline");
+      });
+    return () => {
+      active = false;
+    };
+  }, [connectionAttempt]);
 
   useEffect(() => {
     if (!dirty || receipt) return;
@@ -125,7 +146,7 @@ export default function ApplicationPage() {
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
-    if (!admissionsConfigured) return;
+    if (intakeStatus !== "ready") return;
     inFlight.current = true;
     setSubmitting(true);
     setFailure("");
@@ -232,10 +253,22 @@ export default function ApplicationPage() {
           <div className="step-progress" aria-hidden="true">
             <span style={{ width: `${((step + 1) / 3) * 100}%` }} />
           </div>
-          {!admissionsConfigured && (
+          {intakeStatus !== "ready" && (
             <div className="admission-notice" role="status">
-              현재 신청 접수를 준비 중입니다. 양식을 살펴볼 수 있으며, 실제
-              제출은 접수 연결 후 가능합니다.
+              {intakeStatus === "checking"
+                ? "신청 접수 상태를 확인하고 있어요."
+                : intakeStatus === "offline"
+                  ? "지금은 접수 서버에 연결할 수 없습니다. 작성 내용은 유지되니 연결 상태를 다시 확인해 주세요."
+                  : "현재 신청 접수를 준비 중입니다. 양식을 살펴볼 수 있으며, 실제 제출은 접수 연결 후 가능합니다."}
+              {admissionsConfigured && intakeStatus !== "checking" && (
+                <button
+                  type="button"
+                  className="intake-retry"
+                  onClick={() => setConnectionAttempt((attempt) => attempt + 1)}
+                >
+                  연결 다시 확인
+                </button>
+              )}
             </div>
           )}
           <div className="form-step-heading">
@@ -518,7 +551,9 @@ export default function ApplicationPage() {
                 <button
                   className="button button-blue next-step"
                   type="submit"
-                  disabled={submitting || (step === 2 && !admissionsConfigured)}
+                  disabled={
+                    submitting || (step === 2 && intakeStatus !== "ready")
+                  }
                 >
                   {submitting ? (
                     <>
