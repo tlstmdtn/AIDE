@@ -1,23 +1,25 @@
 :root {
   font-family: "DM Sans Variable", "Noto Sans KR Variable", sans-serif;
   color: #15171b;
-  background: #fff;
+  background: #08090b;
   font-synthesis: none;
   --blue: #2563eb;
   --ink: #111318;
   --muted: #747985;
   --line: #e5e7ec;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --safe-area-top: env(safe-area-inset-top, 0px);
 }
 * {
   box-sizing: border-box;
 }
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 98px;
+  scroll-padding-top: calc(98px + var(--safe-area-top));
 }
 body {
   margin: 0;
+  background: #fff;
 }
 button,
 input,
@@ -191,19 +193,30 @@ h2 {
   top: 10px;
 }
 .header {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   z-index: 30;
   color: #fff;
+  padding-top: var(--safe-area-top);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  background: rgb(8 9 11 / 45%);
+  -webkit-backdrop-filter: blur(22px) saturate(140%);
+  backdrop-filter: blur(22px) saturate(140%);
   border-bottom: 1px solid #ffffff12;
-  transition: background 0.3s;
+  transition: background 0.3s, border-color 0.3s;
 }
 .header.scrolled {
-  position: fixed;
-  background: #0a0b0eef;
-  backdrop-filter: blur(18px);
+  background: rgb(10 11 14 / 65%);
+  border-bottom-color: #ffffff1c;
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .header,
+  .header.scrolled {
+    background: #0a0b0ef5;
+  }
 }
 .nav-wrap {
   width: min(1280px, calc(100% - 80px));
@@ -221,7 +234,7 @@ h2 {
 .nav-links a {
   font-size: 12px;
   font-weight: 500;
-  color: #c2c4c9;
+  color: #dde3ed;
   transition: color 0.2s;
 }
 .nav-links a:hover {
@@ -259,7 +272,7 @@ h2 {
   color: white;
   position: relative;
   overflow: hidden;
-  padding-top: 76px;
+  padding-top: calc(76px + var(--safe-area-top));
 }
 .hero-grid {
   position: absolute;
@@ -2271,7 +2284,7 @@ footer {
 }
 @media (max-width: 560px) {
   html {
-    scroll-padding-top: 82px;
+    scroll-padding-top: calc(82px + var(--safe-area-top));
   }
   .container {
     width: calc(100% - 40px);
@@ -2305,8 +2318,9 @@ footer {
     position: absolute;
     left: 0;
     right: 0;
-    top: 65px;
-    background: #0e1420f7;
+    top: 100%;
+    background: rgb(14 20 32 / 90%);
+    -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
     padding: 15px 24px 22px;
     border-bottom: 1px solid #ffffff15;
@@ -2322,7 +2336,7 @@ footer {
   }
   .hero {
     height: 690px;
-    padding-top: 65px;
+    padding-top: calc(65px + var(--safe-area-top));
   }
   .hero-content {
     padding-top: 101px;
