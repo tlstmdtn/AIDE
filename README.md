@@ -23,11 +23,13 @@ npm test
 
 ## GitHub Pages 배포
 
-`.github/workflows/deploy.yml`이 `main`에 push할 때 사이트를 빌드하고 게시합니다. 최초 실행에서는 빌드는 성공했지만 Pages가 활성화되지 않아 게시 단계가 중단되었습니다.
+공개 주소: **https://tlstmdtn.github.io/AIDE/**
+
+`.github/workflows/deploy.yml`이 `main`에 push할 때 사이트를 빌드하고 게시합니다. Pages 활성화 후 빌드와 배포가 성공했습니다. GitHub Pages 설정은 완료된 상태이며, 아래 절차는 설정을 다시 하거나 수동으로 재배포할 때 사용합니다.
 
 1. [저장소 Pages 설정](https://github.com/tlstmdtn/AIDE/settings/pages)에서 **Build and deployment → Source → GitHub Actions**를 선택합니다.
 2. [배포 워크플로](https://github.com/tlstmdtn/AIDE/actions/workflows/deploy.yml)에서 **Run workflow → main → Run workflow**를 실행합니다.
-3. 배포 작업이 성공하면 `https://tlstmdtn.github.io/AIDE/`에서 확인합니다. 아직 게시 완료가 검증된 주소는 아닙니다.
+3. 배포 작업이 성공하면 `https://tlstmdtn.github.io/AIDE/`에서 확인합니다.
 
 GitHub Pages에서는 `VITE_BASE_PATH=/AIDE/`로 빌드합니다. 다른 호스팅의 도메인 루트에 배포할 때는 기본 `npm run build`를 사용하세요.
 
