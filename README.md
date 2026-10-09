@@ -19,7 +19,24 @@ npm run build
 npm test
 ```
 
-브라우저 테스트는 시스템 Chromium이 있으면 사용합니다. 다른 머신에서는 최초 1회 `npx playwright install --with-deps chromium`으로 브라우저를 준비하세요. `dist/`를 정적 웹 호스팅에 배포할 수 있습니다. 실제 외부 배포는 아직 진행하지 않았습니다.
+브라우저 테스트는 시스템 Chromium이 있으면 사용합니다. 다른 머신에서는 최초 1회 `npx playwright install --with-deps chromium`으로 브라우저를 준비하세요. `dist/`를 정적 웹 호스팅에 배포할 수 있습니다.
+
+## GitHub Pages 배포
+
+`.github/workflows/deploy.yml`이 `main`에 push할 때 사이트를 빌드하고 게시합니다. 최초 실행에서는 빌드는 성공했지만 Pages가 활성화되지 않아 게시 단계가 중단되었습니다.
+
+1. [저장소 Pages 설정](https://github.com/tlstmdtn/AIDE/settings/pages)에서 **Build and deployment → Source → GitHub Actions**를 선택합니다.
+2. [배포 워크플로](https://github.com/tlstmdtn/AIDE/actions/workflows/deploy.yml)에서 **Run workflow → main → Run workflow**를 실행합니다.
+3. 배포 작업이 성공하면 `https://tlstmdtn.github.io/AIDE/`에서 확인합니다. 아직 게시 완료가 검증된 주소는 아닙니다.
+
+GitHub Pages에서는 `VITE_BASE_PATH=/AIDE/`로 빌드합니다. 다른 호스팅의 도메인 루트에 배포할 때는 기본 `npm run build`를 사용하세요.
+
+Pages용 빌드를 로컬에서 확인하려면 다음을 실행합니다.
+
+```sh
+VITE_BASE_PATH=/AIDE/ npm run build
+VITE_BASE_PATH=/AIDE/ npm run preview
+```
 
 ## 구성
 
