@@ -1,0 +1,12 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "installCommand": "npm ci",
+  "buildCommand": "VITE_BASE_PATH=/ npm run build",
+  "outputDirectory": "dist",
+  "trailingSlash": true,
+  "rewrites": [
+    { "source": "/apply/", "destination": "/apply/index.html" },
+    { "source": "/admin/", "destination": "/admin/index.html" }
+  ]
+}

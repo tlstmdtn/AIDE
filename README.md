@@ -23,6 +23,19 @@ npm test
 
 브라우저 테스트는 시스템 Chromium이 있으면 사용합니다. 다른 머신에서는 최초 1회 `npx playwright install --with-deps chromium`으로 브라우저를 준비하세요. 테스트 전용 서버는 5175 포트를 사용합니다. `dist/`를 정적 웹 호스팅에 배포할 수 있습니다.
 
+## Vercel 배포
+
+목표 주소는 **https://studyaide.vercel.app/**입니다. 이 주소는 아직 배포·할당을 확인하지 않았으며, Vercel 프로젝트 연결 후 사용 가능 여부를 확인해야 합니다.
+
+`vercel.json`에 Vite 빌드, `dist` 출력, 도메인 루트(`/`) 경로와 신청·관리자 페이지의 직접 접근을 설정했습니다. Supabase 공개 연결 값은 저장소 설정을 사용하므로 추가 입력 없이 빌드할 수 있습니다.
+
+1. Vercel에서 **Add New → Project**를 열고 GitHub 저장소 **tlstmdtn/AIDE**를 Import합니다.
+2. 프로젝트 이름을 **studyaide**, Production Branch를 **main**, Root Directory를 저장소 루트로 설정합니다. Framework Preset은 **Vite**입니다.
+3. **Deploy** 후 Settings → Domains에서 **studyaide.vercel.app**이 할당되었는지 확인합니다. 이미 다른 프로젝트가 사용하는 주소라면 해당 주소를 바로 사용할 수 없습니다.
+4. `/`, `/apply/`, `/admin/` 직접 방문·새로고침, 신청 접수와 운영진 로그인을 확인합니다. 로그인은 기존 Supabase 이메일·비밀번호 인증을 사용합니다.
+
+Vercel 계정과 GitHub 연결은 저장소 코드만으로 생성되지 않습니다. CLI에서 진행하려면 Vercel 인증과 API 접근이 필요합니다. 토큰을 GitHub 파일이나 프론트엔드 환경변수에 넣지 마세요.
+
 ## GitHub Pages 배포
 
 공개 주소: **https://tlstmdtn.github.io/AIDE/**
