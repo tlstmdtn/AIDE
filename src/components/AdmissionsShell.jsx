@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { ArrowUpRight, Sparkles } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { SITE_BASE } from "../lib/admissions";
 import "../admissions.css";
 
@@ -43,9 +43,6 @@ export default function AdmissionsShell({ children, admin = false }) {
       {children}
       <footer className="admissions-footer">
         <span>© {new Date().getFullYear()} AIDE. AI Design & Engineering.</span>
-        <span>
-          <Sparkles size={12} /> 작은 아이디어에서, 새로운 가능성으로.
-        </span>
       </footer>
     </div>
   );
