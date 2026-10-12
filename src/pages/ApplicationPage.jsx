@@ -6,7 +6,6 @@ import {
   Check,
   CheckCheck,
   LoaderCircle,
-  Sparkles,
   ShieldCheck,
 } from "lucide-react";
 import AdmissionsShell from "../components/AdmissionsShell";
@@ -227,7 +226,6 @@ export default function ApplicationPage() {
           <div className="intro-art" aria-hidden="true">
             <div className="intro-ring" />
             <div className="intro-orb" />
-            <Sparkles />
           </div>
           <div className="intro-bottom">
             A LITTLE IDEA.
@@ -299,14 +297,6 @@ export default function ApplicationPage() {
                       maxLength={200}
                     />
                   </Field>
-                  <div className="form-small-note">
-                    <Sparkles size={16} />
-                    <p>
-                      잘하는 것보다, 만들고 싶은 마음이 중요해요.
-                      <br />
-                      편안하게 여러분의 이야기를 들려주세요.
-                    </p>
-                  </div>
                 </>
               )}
               {step === 1 && (

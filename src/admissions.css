@@ -215,12 +215,6 @@
   );
   box-shadow: 8px 10px 17px #08276155;
 }
-.intro-art > svg {
-  position: absolute;
-  right: 18px;
-  top: 9px;
-  color: #9dcaff;
-}
 .intro-bottom {
   position: absolute;
   bottom: 32px;
@@ -386,23 +380,6 @@
 .has-error textarea,
 input[aria-invalid="true"] {
   border-color: #d8636b;
-}
-.form-small-note {
-  display: flex;
-  align-items: flex-start;
-  gap: 11px;
-  padding: 18px 20px;
-  background: #f6f8fc;
-  border-radius: 7px;
-  font-size: 10px;
-  line-height: 1.9;
-  color: #8a98b1;
-  margin-top: 35px;
-}
-.form-small-note > svg {
-  color: #6e99e5;
-  margin-top: 2px;
-  flex-shrink: 0;
 }
 .application-form-bottom {
   border-top: 1px solid #e9edf4;
@@ -1385,12 +1362,6 @@ input[aria-invalid="true"] {
   }
   .application-form-bottom > div {
     gap: 7px;
-  }
-  .form-small-note {
-    margin-top: 25px;
-    font-size: 9px;
-    padding: 15px;
-    gap: 9px;
   }
   .ai-options {
     gap: 8px;
