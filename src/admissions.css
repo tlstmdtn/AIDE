@@ -625,10 +625,6 @@ input[aria-invalid="true"] {
   color: #556887;
   font-size: 10px;
 }
-.receipt-details .receipt-id {
-  font-size: 8px;
-  word-break: break-all;
-}
 .application-success-card > .receipt-note {
   font-size: 10px;
   word-break: keep-all;
@@ -1427,9 +1423,6 @@ input[aria-invalid="true"] {
     display: block;
     font-size: 10px;
     margin-top: 5px;
-  }
-  .receipt-details .receipt-id {
-    font-size: 9px;
   }
   .application-success-card .button {
     font-size: 11px;

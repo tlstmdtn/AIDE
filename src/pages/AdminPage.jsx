@@ -25,7 +25,6 @@ import {
   isApplicationAdmin,
   koreanDate,
   koreanTime,
-  signInAsAdmin,
   supabase,
 } from "../lib/admissions";
 
@@ -101,6 +100,7 @@ export default function AdminPage() {
   const [authorized, setAuthorized] = useState(false);
   const [checking, setChecking] = useState(admissionsConfigured);
   const [authError, setAuthError] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [signingIn, setSigningIn] = useState(false);
   const [rows, setRows] = useState([]);
@@ -195,10 +195,19 @@ export default function AdminPage() {
     setSigningIn(true);
     setAuthError("");
     try {
-      await signInAsAdmin(password);
-      setPassword("");
-    } catch (error) {
-      setAuthError(error.message);
+      const { error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+      if (error)
+        setAuthError(
+          error.status >= 500
+            ? "로그인하지 못했어요. 잠시 후 다시 시도해 주세요."
+            : "로그인하지 못했어요. 이메일과 비밀번호를 확인해 주세요.",
+        );
+      else setPassword("");
+    } catch {
+      setAuthError("연결을 확인한 뒤 다시 시도해 주세요.");
     } finally {
       setSigningIn(false);
     }
@@ -261,7 +270,7 @@ export default function AdminPage() {
             </div>
             <div className="eyebrow section-eyebrow">AIDE ADMIN</div>
             <h1>AIDE 관리자</h1>
-            <p>관리자 비밀번호를 입력해 주세요.</p>
+            <p>운영진 이메일과 비밀번호로 로그인해 주세요.</p>
             {!admissionsConfigured && (
               <div className="admission-notice" role="status">
                 관리자 서비스 연결을 준비 중입니다. 연결 완료 후 로그인할 수
@@ -269,6 +278,18 @@ export default function AdminPage() {
               </div>
             )}
             <form onSubmit={login}>
+              <div className="admission-field">
+                <label htmlFor="admin-email">이메일</label>
+                <input
+                  id="admin-email"
+                  type="email"
+                  autoComplete="username"
+                  placeholder="운영진 이메일"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
               <div className="admission-field">
                 <label htmlFor="admin-password">비밀번호</label>
                 <input

@@ -183,9 +183,6 @@ export default function ApplicationPage() {
               <span>
                 접수 시간 <b>{koreanTime(receipt.submitted_at)}</b>
               </span>
-              <span>
-                접수 번호 <b className="receipt-id">{receipt.application_id}</b>
-              </span>
             </div>
             <p className="receipt-note">
               운영진이 신청 내용을 확인한 뒤 남겨주신 연락처로 안내드릴게요.

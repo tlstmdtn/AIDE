@@ -49,10 +49,9 @@ VITE_BASE_PATH=/AIDE/ npm run preview
 - 스크롤 진입 애니메이션과 부유 모션; 기기의 모션 감소 설정 지원
 - 키보드로 조작 가능한 커리큘럼 탭, FAQ, 포커스가 유지되는 모달
 - 별도 `/apply/` 페이지의 3단계 신청 양식과 실제 서버 접수 확인
-- `/admin/`의 비밀번호 전용 운영진 로그인, 접수 시간·전체 답변 표, 검색·기간·AI 필터, 엑셀 다운로드
+- `/admin/`의 이메일·비밀번호 운영진 로그인, 접수 시간·전체 답변 표, 검색·기간·AI 필터, 엑셀 다운로드
 - 신청 페이지 상단 중앙 AIDE 로고 5번 클릭 시 관리자 로그인 페이지로 이동
 - Supabase Auth + Postgres RLS: 운영진만 신청 내역 읽기 가능
-- 서버 로그인 함수: `supabase/functions/admin-login/` (관리자 이메일·비밀번호는 공개 사이트에 포함하지 않음)
 - 신청·관리자 화면: `src/pages/`, `src/admissions.css`
 - 데이터 접근과 엑셀: `src/lib/admissions.js`
 - 주요 콘텐츠와 인터랙션: `src/main.jsx`

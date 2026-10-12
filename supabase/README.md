@@ -2,7 +2,7 @@
 
 사이트는 GitHub Pages에서 실행됩니다. 신청 내역은 Supabase Postgres에 저장하고, Supabase Auth 로그인 및 데이터베이스 RLS로 관리자 접근을 제한합니다. 로고 5번 클릭은 관리자 페이지의 진입 방법일 뿐, 인증을 대체하지 않습니다.
 
-관리자 화면에는 비밀번호 입력칸만 표시됩니다. `admin-login` Edge Function이 서버에 설정된 운영진 이메일로 Supabase Auth 인증을 수행하고 관리자 권한까지 확인한 뒤 세션을 발급합니다. 이메일이나 비밀번호를 공개 프론트엔드에 저장하지 않습니다.
+관리자 화면에서 운영진 이메일과 비밀번호로 Supabase Auth에 직접 로그인합니다. 인증 후 관리자 권한을 확인하며 별도의 로그인 Edge Function은 필요하지 않습니다.
 
 ## 1. 프로젝트와 테이블
 
@@ -25,15 +25,6 @@ insert into public.application_admins (user_id)
 values ('운영진-사용자의-UUID');
 ```
 
-이메일 없이 로그인하도록 아래 서버 함수도 설정합니다.
-
-1. `AIDE_ADMIN_EMAIL`을 기존 운영진 이메일로 Supabase Edge Functions의 Secrets에 등록합니다. 비밀번호는 Supabase Auth 계정에서 관리하며 함수 환경변수에는 넣지 않습니다.
-2. `supabase/functions/admin-login/index.ts`를 배포합니다. CLI가 인증된 환경에서는 `supabase functions deploy admin-login --project-ref 프로젝트-ID --no-verify-jwt`를 실행합니다. 대시보드에서도 `admin-login`이라는 이름으로 코드 전체를 붙여 넣어 배포할 수 있습니다.
-3. 대시보드에서 배포하면 **Verify JWT with legacy secret**을 끕니다. CLI의 `supabase/config.toml`에는 동일한 설정이 있습니다. 함수가 로그인 전 비밀번호를 직접 검증하기 때문에 진입 단계의 JWT는 사용하지 않습니다.
-4. 기본 `SUPABASE_URL`, `SUPABASE_ANON_KEY` 서버 환경변수를 사용합니다. service-role 키는 필요하지 않습니다. 함수는 비밀번호 검증 후 해당 세션으로 `application_admins`를 조회하고, 관리자 권한이 없는 세션을 폐기합니다.
-
-함수 배포·관리자 비밀번호 설정은 공개 publishable key로 실행할 수 없습니다. 서버 설정이 없으면 로그인 실패를 안내하며 신청 데이터는 공개하지 않습니다. 기존 Supabase Auth의 로그인 시도 제한과 DB RLS가 유지됩니다.
-
 ## 3. 공개 연결 값
 
 프로젝트 Connect 또는 Settings → API Keys에서 Project URL과 **publishable key**를 확인합니다. 두 값은 공개 프론트엔드 설정이며 DB 관리자 비밀 키가 아닙니다. **service_role, sb_secret 키나 DB 비밀번호는 사용하면 안 됩니다.**
@@ -53,7 +44,7 @@ GitHub 공개 사이트도 공개 기본 설정으로 빌드됩니다. 다른 �
 
 ## 4. 연결 후 실제 검증
 
-1. 신청 페이지에서 테스트 신청을 제출하고 실제 접수 번호·시간이 표시되는지 확인합니다.
+1. 신청 페이지에서 테스트 신청을 제출하고 완료 메시지와 접수 시간이 표시되고 접수 번호는 노출되지 않는지 확인합니다.
 2. 별도 브라우저에서 운영진 로그인 후 동일 신청 내용과 시간이 표시되는지 확인합니다.
 3. 엑셀 다운로드에서 모든 입력 항목과 한국 시간이 유지되는지 확인합니다.
 4. 비로그인·일반 계정으로 신청 목록을 읽을 수 없는지 확인합니다.

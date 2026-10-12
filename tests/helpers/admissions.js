@@ -96,31 +96,29 @@ export async function mockBackend(
         ]),
       });
     }
-    if (path.endsWith("/functions/v1/admin-login")) {
+    if (path.endsWith("/auth/v1/token")) {
       const credentials = route.request().postDataJSON();
       logins.push(credentials);
       if (!loginReady)
         return route.fulfill({
           status: 503,
           headers,
-          body: JSON.stringify({ code: "login_not_configured" }),
+          body: JSON.stringify({
+            msg: "Authentication temporarily unavailable",
+          }),
         });
-      if (credentials.password !== "not-a-real-password")
+      if (
+        credentials.email !== user.email ||
+        credentials.password !== "not-a-real-password"
+      )
         return route.fulfill({
-          status: 401,
+          status: 400,
           headers,
-          body: JSON.stringify({ code: "login_failed" }),
+          body: JSON.stringify({
+            code: "invalid_credentials",
+            msg: "Invalid login credentials",
+          }),
         });
-      return route.fulfill({
-        status: 200,
-        headers,
-        body: JSON.stringify({
-          access_token: token,
-          refresh_token: "test-refresh",
-        }),
-      });
-    }
-    if (path.endsWith("/auth/v1/token"))
       return route.fulfill({
         status: 200,
         headers,
@@ -132,6 +130,7 @@ export async function mockBackend(
           user,
         }),
       });
+    }
     if (path.endsWith("/auth/v1/user"))
       return route.fulfill({
         status: 200,

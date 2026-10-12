@@ -77,6 +77,10 @@ test("submission shows success only after server receipt and safely retries fail
     p_consent: true,
   });
   await expect(page.getByText("2026-10-09 18:20:00")).toBeVisible();
+  await expect(page.getByText("접수 번호", { exact: false })).toHaveCount(0);
+  await expect(
+    page.getByText(backend.submissions[1].p_request_id, { exact: true }),
+  ).toHaveCount(0);
 });
 
 test("five logo presses navigate to the protected admin page", async ({
@@ -100,6 +104,7 @@ test("admin can search, read full answers, export Excel safely, and sign out", a
 }) => {
   await mockBackend(page);
   await page.goto("/admin/");
+  await page.getByLabel("이메일", { exact: true }).fill("admin@example.com");
   await page
     .getByLabel("비밀번호", { exact: true })
     .fill("not-a-real-password");
@@ -135,18 +140,24 @@ test("admin can search, read full answers, export Excel safely, and sign out", a
   await expect(page.getByRole("table")).toHaveCount(0);
 });
 
-test("admin login only asks for a password and rejects incorrect passwords", async ({
+test("admin login requires email and password and rejects incorrect credentials", async ({
   page,
 }) => {
   const backend = await mockBackend(page);
   await page.goto("/admin/");
-  await expect(page.getByLabel("이메일", { exact: true })).toHaveCount(0);
+  await page.getByLabel("이메일", { exact: true }).fill("admin@example.com");
+  await expect(page.getByLabel("이메일", { exact: true })).toBeVisible();
   await page.getByLabel("비밀번호", { exact: true }).fill("incorrect-password");
   await page.getByRole("button", { name: "관리자 로그인" }).click();
   await expect(page.getByRole("alert")).toContainText(
-    "비밀번호가 올바르지 않습니다",
+    "이메일과 비밀번호를 확인해 주세요",
   );
-  expect(backend.logins).toEqual([{ password: "incorrect-password" }]);
+  expect(backend.logins).toEqual([
+    expect.objectContaining({
+      email: "admin@example.com",
+      password: "incorrect-password",
+    }),
+  ]);
   expect(backend.listRequests()).toBe(0);
   await expect(page.getByRole("table")).toHaveCount(0);
 });
@@ -156,11 +167,14 @@ test("unavailable admin service does not create a session or expose applications
 }) => {
   const backend = await mockBackend(page, { loginReady: false });
   await page.goto("/admin/");
+  await page.getByLabel("이메일", { exact: true }).fill("admin@example.com");
   await page
     .getByLabel("비밀번호", { exact: true })
     .fill("not-a-real-password");
   await page.getByRole("button", { name: "관리자 로그인" }).click();
-  await expect(page.getByRole("alert")).toContainText("로그인 연결을 준비 중");
+  await expect(page.getByRole("alert")).toContainText(
+    "잠시 후 다시 시도해 주세요",
+  );
   expect(backend.listRequests()).toBe(0);
   await expect(page.getByRole("table")).toHaveCount(0);
 });
@@ -170,6 +184,7 @@ test("authenticated non-admin sees no private application data", async ({
 }) => {
   const backend = await mockBackend(page, { admin: false });
   await page.goto("/admin/");
+  await page.getByLabel("이메일", { exact: true }).fill("admin@example.com");
   await page
     .getByLabel("비밀번호", { exact: true })
     .fill("not-a-real-password");
