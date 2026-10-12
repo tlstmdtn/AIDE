@@ -29,6 +29,34 @@ export const blankApplication = {
   contact: "",
 };
 
+export async function signInAsAdmin(password) {
+  const { data, error } = await supabase.functions.invoke("admin-login", {
+    body: { password },
+  });
+  if (error) {
+    const status = error.context?.status;
+    if (status === 401)
+      throw new Error("비밀번호가 올바르지 않습니다. 다시 확인해 주세요.");
+    if (status === 429)
+      throw new Error("로그인 시도가 많습니다. 잠시 후 다시 시도해 주세요.");
+    if (status === 404 || status === 503)
+      throw new Error(
+        "관리자 로그인 연결을 준비 중입니다. 잠시 후 다시 시도해 주세요.",
+      );
+    throw new Error(
+      "로그인하지 못했어요. 연결을 확인한 뒤 다시 시도해 주세요.",
+    );
+  }
+  if (!data?.access_token || !data?.refresh_token)
+    throw new Error("로그인 확인을 받지 못했어요. 다시 시도해 주세요.");
+  const { error: sessionError } = await supabase.auth.setSession({
+    access_token: data.access_token,
+    refresh_token: data.refresh_token,
+  });
+  if (sessionError)
+    throw new Error("로그인 상태를 확인하지 못했어요. 다시 시도해 주세요.");
+}
+
 export async function checkIntakeReady() {
   if (!supabase) return "unconfigured";
   // The migration rejects this request before any insert. Verify the real RPC

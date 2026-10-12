@@ -25,6 +25,7 @@ import {
   isApplicationAdmin,
   koreanDate,
   koreanTime,
+  signInAsAdmin,
   supabase,
 } from "../lib/admissions";
 
@@ -100,7 +101,6 @@ export default function AdminPage() {
   const [authorized, setAuthorized] = useState(false);
   const [checking, setChecking] = useState(admissionsConfigured);
   const [authError, setAuthError] = useState("");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [signingIn, setSigningIn] = useState(false);
   const [rows, setRows] = useState([]);
@@ -195,15 +195,10 @@ export default function AdminPage() {
     setSigningIn(true);
     setAuthError("");
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
-      });
-      if (error)
-        setAuthError("로그인하지 못했어요. 이메일과 비밀번호를 확인해 주세요.");
-      else setPassword("");
-    } catch {
-      setAuthError("연결을 확인한 뒤 다시 시도해 주세요.");
+      await signInAsAdmin(password);
+      setPassword("");
+    } catch (error) {
+      setAuthError(error.message);
     } finally {
       setSigningIn(false);
     }
@@ -265,12 +260,8 @@ export default function AdminPage() {
               <LockKeyhole size={27} />
             </div>
             <div className="eyebrow section-eyebrow">AIDE ADMIN</div>
-            <h1>
-              함께할 사람들의
-              <br />
-              이야기를 만나보세요.
-            </h1>
-            <p>운영진 계정으로 로그인해 주세요.</p>
+            <h1>AIDE 관리자</h1>
+            <p>관리자 비밀번호를 입력해 주세요.</p>
             {!admissionsConfigured && (
               <div className="admission-notice" role="status">
                 관리자 서비스 연결을 준비 중입니다. 연결 완료 후 로그인할 수
@@ -278,18 +269,6 @@ export default function AdminPage() {
               </div>
             )}
             <form onSubmit={login}>
-              <div className="admission-field">
-                <label htmlFor="admin-email">이메일</label>
-                <input
-                  id="admin-email"
-                  type="email"
-                  autoComplete="username"
-                  placeholder="운영진 이메일"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
               <div className="admission-field">
                 <label htmlFor="admin-password">비밀번호</label>
                 <input
@@ -346,7 +325,7 @@ export default function AdminPage() {
             <p>AIDE와 함께할 사람들의 이야기를 한곳에서 확인하세요.</p>
           </div>
           <div className="admin-account">
-            <span>{session.user.email}</span>
+            <span>AIDE 관리자</span>
             <button onClick={logout}>
               <LogOut size={14} /> 로그아웃
             </button>

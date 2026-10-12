@@ -8,7 +8,7 @@ export default function AdmissionsShell({ children, admin = false }) {
   return (
     <div className={`admissions-page ${admin ? "admin-page" : ""}`}>
       <header className="admissions-header">
-        <div className="admissions-nav">
+        <div className={`admissions-nav ${admin ? "" : "application-nav"}`}>
           {admin ? (
             <a className="wordmark" href={SITE_BASE} aria-label="AIDE 홈">
               AIDE
@@ -28,12 +28,16 @@ export default function AdmissionsShell({ children, admin = false }) {
               <span className="logo-dot" />
             </button>
           )}
-          <span className="admissions-nav-caption">
-            {admin ? "STUDY ADMINISTRATION" : "YOUR IDEA STARTS HERE"}
-          </span>
-          <a className="admissions-home" href={SITE_BASE}>
-            홈으로 돌아가기 <ArrowUpRight size={15} />
-          </a>
+          {admin && (
+            <>
+              <span className="admissions-nav-caption">
+                STUDY ADMINISTRATION
+              </span>
+              <a className="admissions-home" href={SITE_BASE}>
+                홈으로 돌아가기 <ArrowUpRight size={15} />
+              </a>
+            </>
+          )}
         </div>
       </header>
       {children}

@@ -1,0 +1,4 @@
+[functions.admin-login]
+# The endpoint verifies the supplied password through Supabase Auth itself.
+# A public publishable key is not a JWT; clients are not signed in yet.
+verify_jwt = false

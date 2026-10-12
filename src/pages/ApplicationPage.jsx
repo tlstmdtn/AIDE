@@ -204,15 +204,9 @@ export default function ApplicationPage() {
     <AdmissionsShell>
       <main className="application-layout">
         <aside className="application-intro">
-          <div className="eyebrow">FROM IDEA TO WEBSITE</div>
-          <h1>
-            당신의 아이디어가 <br />
-            시작되는 곳.
-          </h1>
-          <p>
-            나만의 웹사이트를 만드는 3주. <br />
-            첫걸음을 함께해요.
-          </p>
+          <div className="eyebrow">STUDY APPLICATION</div>
+          <h1>AIDE 지원 신청서</h1>
+          <p>아래 항목을 순서대로 작성해 주세요.</p>
           <ol className="application-steps" aria-label="신청 단계">
             {steps.map((item, i) => (
               <li

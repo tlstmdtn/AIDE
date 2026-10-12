@@ -35,6 +35,9 @@
   color: #fff;
   cursor: pointer;
 }
+.application-nav {
+  justify-content: center;
+}
 .admissions-nav-caption {
   font-size: 9px;
   letter-spacing: 2px;

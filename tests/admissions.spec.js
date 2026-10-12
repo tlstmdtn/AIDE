@@ -100,7 +100,6 @@ test("admin can search, read full answers, export Excel safely, and sign out", a
 }) => {
   await mockBackend(page);
   await page.goto("/admin/");
-  await page.getByLabel("이메일", { exact: true }).fill("admin@example.com");
   await page
     .getByLabel("비밀번호", { exact: true })
     .fill("not-a-real-password");
@@ -136,12 +135,41 @@ test("admin can search, read full answers, export Excel safely, and sign out", a
   await expect(page.getByRole("table")).toHaveCount(0);
 });
 
+test("admin login only asks for a password and rejects incorrect passwords", async ({
+  page,
+}) => {
+  const backend = await mockBackend(page);
+  await page.goto("/admin/");
+  await expect(page.getByLabel("이메일", { exact: true })).toHaveCount(0);
+  await page.getByLabel("비밀번호", { exact: true }).fill("incorrect-password");
+  await page.getByRole("button", { name: "관리자 로그인" }).click();
+  await expect(page.getByRole("alert")).toContainText(
+    "비밀번호가 올바르지 않습니다",
+  );
+  expect(backend.logins).toEqual([{ password: "incorrect-password" }]);
+  expect(backend.listRequests()).toBe(0);
+  await expect(page.getByRole("table")).toHaveCount(0);
+});
+
+test("unavailable admin service does not create a session or expose applications", async ({
+  page,
+}) => {
+  const backend = await mockBackend(page, { loginReady: false });
+  await page.goto("/admin/");
+  await page
+    .getByLabel("비밀번호", { exact: true })
+    .fill("not-a-real-password");
+  await page.getByRole("button", { name: "관리자 로그인" }).click();
+  await expect(page.getByRole("alert")).toContainText("로그인 연결을 준비 중");
+  expect(backend.listRequests()).toBe(0);
+  await expect(page.getByRole("table")).toHaveCount(0);
+});
+
 test("authenticated non-admin sees no private application data", async ({
   page,
 }) => {
   const backend = await mockBackend(page, { admin: false });
   await page.goto("/admin/");
-  await page.getByLabel("이메일", { exact: true }).fill("member@example.com");
   await page
     .getByLabel("비밀번호", { exact: true })
     .fill("not-a-real-password");

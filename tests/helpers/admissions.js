@@ -27,9 +27,15 @@ export const rows = [
 
 export async function mockBackend(
   page,
-  { admin = true, failFirst = false, intakeReady = true } = {},
+  {
+    admin = true,
+    failFirst = false,
+    intakeReady = true,
+    loginReady = true,
+  } = {},
 ) {
   const submissions = [];
+  const logins = [];
   let listRequests = 0;
   const user = {
     id: userId,
@@ -90,6 +96,30 @@ export async function mockBackend(
         ]),
       });
     }
+    if (path.endsWith("/functions/v1/admin-login")) {
+      const credentials = route.request().postDataJSON();
+      logins.push(credentials);
+      if (!loginReady)
+        return route.fulfill({
+          status: 503,
+          headers,
+          body: JSON.stringify({ code: "login_not_configured" }),
+        });
+      if (credentials.password !== "not-a-real-password")
+        return route.fulfill({
+          status: 401,
+          headers,
+          body: JSON.stringify({ code: "login_failed" }),
+        });
+      return route.fulfill({
+        status: 200,
+        headers,
+        body: JSON.stringify({
+          access_token: token,
+          refresh_token: "test-refresh",
+        }),
+      });
+    }
     if (path.endsWith("/auth/v1/token"))
       return route.fulfill({
         status: 200,
@@ -126,7 +156,7 @@ export async function mockBackend(
     }
     throw new Error(`Unexpected test API route: ${path}`);
   });
-  return { submissions, listRequests: () => listRequests };
+  return { submissions, logins, listRequests: () => listRequests };
 }
 
 export async function fillApplication(page) {
