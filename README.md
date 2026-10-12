@@ -25,7 +25,7 @@ npm test
 
 ## Vercel 배포
 
-목표 주소는 **https://studyaide.vercel.app/**입니다. 이 주소는 아직 배포·할당을 확인하지 않았으며, Vercel 프로젝트 연결 후 사용 가능 여부를 확인해야 합니다.
+공개 주소는 **https://studyaide.vercel.app/**입니다. `tlstmdtn/studyaide` 프로젝트에 정식 배포하고 HTTPS로 홈·신청·관리자 페이지와 정적 파일의 공개 접속을 확인했습니다.
 
 `vercel.json`에 Vite 빌드, `dist` 출력, 도메인 루트(`/`) 경로와 신청·관리자 페이지의 직접 접근을 설정했습니다. Supabase 공개 연결 값은 저장소 설정을 사용하므로 추가 입력 없이 빌드할 수 있습니다.
 
@@ -34,7 +34,7 @@ npm test
 3. **Deploy** 후 Settings → Domains에서 **studyaide.vercel.app**이 할당되었는지 확인합니다. 이미 다른 프로젝트가 사용하는 주소라면 해당 주소를 바로 사용할 수 없습니다.
 4. `/`, `/apply/`, `/admin/` 직접 방문·새로고침, 신청 접수와 운영진 로그인을 확인합니다. 로그인은 기존 Supabase 이메일·비밀번호 인증을 사용합니다.
 
-Vercel 계정과 GitHub 연결은 저장소 코드만으로 생성되지 않습니다. CLI에서 진행하려면 Vercel 인증과 API 접근이 필요합니다. 토큰을 GitHub 파일이나 프론트엔드 환경변수에 넣지 마세요.
+현재 사이트는 CLI로 배포되었습니다. GitHub 자동 배포는 Vercel 계정에 GitHub Login Connection을 추가한 뒤 `vercel git connect https://github.com/tlstmdtn/AIDE.git`로 연결해야 합니다. 기존 시도는 Login Connection이 없어 거절되었으며, 자동 배포 연결 완료로 표시하지 않습니다. CLI에서 진행하려면 Vercel 인증과 API 접근이 필요합니다. 토큰을 GitHub 파일이나 프론트엔드 환경변수에 넣지 마세요.
 
 ## GitHub Pages 배포
 
@@ -72,7 +72,7 @@ VITE_BASE_PATH=/AIDE/ npm run preview
 
 ## 실제 모집 전 연결할 항목
 
-신청 페이지는 `https://tlstmdtn.github.io/AIDE/apply/`, 관리자 로그인은 `https://tlstmdtn.github.io/AIDE/admin/`입니다. GitHub Pages에서 두 주소를 직접 방문하거나 새로고침할 수 있도록 각각 HTML 진입점을 빌드합니다.
+신청 페이지는 `https://studyaide.vercel.app/apply/`, 관리자 로그인은 `https://studyaide.vercel.app/admin/`입니다. 두 주소를 직접 방문하거나 새로고침할 수 있도록 각각 HTML 진입점을 빌드합니다.
 
 **공개 연결 값은 `config/admissions.public.json`에 반영되어 있습니다. 실제 데이터 저장을 활성화하려면 [Supabase 연결 안내](supabase/README.md)를 따라 테이블과 운영진 계정을 설정해야 합니다.** 접수 서버가 준비되었는지 확인한 뒤 제출을 활성화하며, 서버에 저장되지 않은 신청을 접수 완료로 표시하지 않습니다. 작성 중인 답변은 메모리에만 유지하며 새로고침·페이지 이탈 시 사라집니다.
 

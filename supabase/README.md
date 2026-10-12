@@ -1,6 +1,6 @@
 # 실제 신청 접수 연결
 
-사이트는 GitHub Pages에서 실행됩니다. 신청 내역은 Supabase Postgres에 저장하고, Supabase Auth 로그인 및 데이터베이스 RLS로 관리자 접근을 제한합니다. 로고 5번 클릭은 관리자 페이지의 진입 방법일 뿐, 인증을 대체하지 않습니다.
+사이트는 Vercel의 `https://studyaide.vercel.app/`에서 실행됩니다. 신청 내역은 Supabase Postgres에 저장하고, Supabase Auth 로그인 및 데이터베이스 RLS로 관리자 접근을 제한합니다. 로고 5번 클릭은 관리자 페이지의 진입 방법일 뿐, 인증을 대체하지 않습니다.
 
 관리자 화면에서 운영진 이메일과 비밀번호로 Supabase Auth에 직접 로그인합니다. 인증 후 관리자 권한을 확인하며 별도의 로그인 Edge Function은 필요하지 않습니다.
 
@@ -40,7 +40,7 @@ VITE_SUPABASE_PUBLISHABLE_KEY=공개_publishable_key
 
 GitHub 공개 사이트도 공개 기본 설정으로 빌드됩니다. 다른 프로젝트로 재정의하려면 저장소 **Settings → Secrets and variables → Actions → Variables**에 같은 이름의 Repository variables 두 개를 함께 등록한 뒤 배포 워크플로를 다시 실행하세요. 이 환경의 GitHub 인증은 Repository variables 목록·설정 권한이 없어 해당 재정의는 계정에서 등록해야 합니다.
 
-관리자는 `https://tlstmdtn.github.io/AIDE/apply/` 상단의 AIDE 로고를 5번 눌러 이동하거나 `/AIDE/admin/`에 직접 접속할 수 있습니다. 인증 후에만 실제 신청 데이터를 불러옵니다.
+관리자는 `https://studyaide.vercel.app/apply/` 상단의 AIDE 로고를 5번 눌러 이동하거나 `https://studyaide.vercel.app/admin/`에 직접 접속할 수 있습니다. 인증 후에만 실제 신청 데이터를 불러옵니다.
 
 ## 4. 연결 후 실제 검증
 
