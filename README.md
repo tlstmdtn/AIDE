@@ -57,6 +57,8 @@ VITE_BASE_PATH=/AIDE/ npm run preview
 
 ## 구성
 
+공식 AIDE 심벌은 파란색 입체 별 모양 로고입니다. 원본 자산은 `public/brand/aide-symbol.png`에 보관하고, 모든 페이지의 탭 아이콘에 PNG·ICO 버전을 사용합니다.
+
 - React, Vite, Lucide 아이콘
 - 반응형 레이아웃과 CSS로 제작한 입체 그래픽 및 프로젝트 콘셉트
 - 스크롤 진입 애니메이션과 부유 모션; 기기의 모션 감소 설정 지원
