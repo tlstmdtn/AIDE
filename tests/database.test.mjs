@@ -29,12 +29,15 @@ before(async () => {
   await db.exec(`
     create role anon; create role authenticated;
     create schema auth;
-    create table auth.users (id uuid primary key);
+    create table auth.users (
+      id uuid primary key, email text, email_confirmed_at timestamptz,
+      deleted_at timestamptz
+    );
     create function auth.uid() returns uuid language sql stable as $$
       select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid;
     $$;
     grant usage on schema public, auth to anon, authenticated;
-    insert into auth.users values ('${admin}'), ('${member}');
+    insert into auth.users (id) values ('${admin}'), ('${member}');
   `);
   await db.exec(
     await readFile(
@@ -152,6 +155,41 @@ test("registered admin can read full answers but cannot modify submissions from 
       db.query("update public.applications set residence = 'changed'"),
       /permission denied/,
     );
+  } finally {
+    await db.exec("reset role");
+  }
+});
+
+test("dedicated portal setup grants only the confirmed account and preserves existing admins", async () => {
+  const template = await readFile(
+    new URL("../supabase/admin-portal-access.sql", import.meta.url), "utf8",
+  );
+  const setup = template.replace("PASTE_CREATED_USER_UUID_HERE", member);
+  // Missing or unconfirmed identities must never silently grant membership.
+  await assert.rejects(db.exec(setup), /First create and auto-confirm/);
+  await db.exec("rollback");
+  await db.query("update auth.users set email = $1 where id = $2", [
+    "admin@studyaide.vercel.app", member,
+  ]);
+  await assert.rejects(db.exec(setup), /First create and auto-confirm/);
+  await db.exec("rollback");
+  await db.query("update auth.users set email_confirmed_at = now() where id = $1", [member]);
+  await assert.rejects(
+    db.exec(template.replace("PASTE_CREATED_USER_UUID_HERE", admin)),
+    /First create and auto-confirm/,
+  );
+  await db.exec("rollback");
+  await db.exec(setup);
+  await db.exec(setup);
+  assert.deepEqual(
+    (await db.query("select user_id from application_admins order by user_id")).rows,
+    [{ user_id: admin }, { user_id: member }],
+  );
+  await db.exec("set role anon");
+  try {
+    await assert.rejects(db.exec(setup), /permission denied/);
+    await db.exec("rollback");
+    await assert.rejects(db.query("select * from applications"), /permission denied/);
   } finally {
     await db.exec("reset role");
   }

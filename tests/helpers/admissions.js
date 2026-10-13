@@ -1,3 +1,5 @@
+import { ADMIN_LOGIN_EMAIL } from "../../src/lib/admin-identity";
+
 const userId = "10000000-0000-4000-8000-000000000001";
 export const rows = [
   {
@@ -32,6 +34,7 @@ export async function mockBackend(
     failFirst = false,
     intakeReady = true,
     loginReady = true,
+    rateLimited = false,
   } = {},
 ) {
   const submissions = [];
@@ -41,7 +44,7 @@ export async function mockBackend(
     id: userId,
     aud: "authenticated",
     role: "authenticated",
-    email: "admin@example.com",
+    email: ADMIN_LOGIN_EMAIL,
     app_metadata: {},
     user_metadata: {},
     created_at: "2026-01-01T00:00:00Z",
@@ -99,6 +102,11 @@ export async function mockBackend(
     if (path.endsWith("/auth/v1/token")) {
       const credentials = route.request().postDataJSON();
       logins.push(credentials);
+      if (rateLimited)
+        return route.fulfill({
+          status: 429, headers,
+          body: JSON.stringify({ code: "over_request_rate_limit", msg: "Too many requests" }),
+        });
       if (!loginReady)
         return route.fulfill({
           status: 503,

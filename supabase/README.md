@@ -2,7 +2,7 @@
 
 사이트는 Vercel의 `https://studyaide.vercel.app/`에서 실행됩니다. 신청 내역은 Supabase Postgres에 저장하고, Supabase Auth 로그인 및 데이터베이스 RLS로 관리자 접근을 제한합니다. 로고 5번 클릭은 관리자 페이지의 진입 방법일 뿐, 인증을 대체하지 않습니다.
 
-관리자 화면에서 운영진 이메일과 비밀번호로 Supabase Auth에 직접 로그인합니다. 인증 후 관리자 권한을 확인하며 별도의 로그인 Edge Function은 필요하지 않습니다.
+관리자 화면에는 **전용 비밀번호 입력 칸만** 표시합니다. 내부적으로는 별도의 Supabase Auth 계정 `admin@studyaide.vercel.app`으로 인증하고, RLS에서 운영진 권한을 확인합니다. 이 주소는 공개 로그인 식별자이며 메일함이 아닙니다. 개인 이메일이나 비밀번호는 프론트엔드에 넣지 않습니다. 기존 이메일 계정의 비밀번호는 변경하지 않습니다. 별도의 Edge Function이나 service-role 키가 필요하지 않습니다.
 
 ## 1. 프로젝트와 테이블
 
@@ -14,16 +14,18 @@ Supabase에서 프로젝트를 만들고 SQL Editor에서 `migrations/2026100900
 - 익명 방문자는 신청 목록을 읽거나 수정·삭제할 수 없습니다.
 - 관리자 자격이 없는 로그인 사용자에게도 신청 내역을 공개하지 않습니다.
 
-## 2. 운영진 로그인
+## 2. 관리자 전용 비밀번호 설정 (최초 1회)
 
-Supabase Authentication의 Users 화면에서 운영진 이메일로 사용자를 생성하고 비밀번호를 안전하게 설정하세요. 비밀번호는 채팅, GitHub 파일, 프론트엔드 환경변수에 넣지 마세요. 공개 회원 가입은 필요하지 않으므로 Auth 설정에서 신규 가입을 비활성화하세요.
+1. 먼저 Supabase Authentication 설정에서 **Allow new users to sign up**을 비활성화합니다. [Supabase Authentication → Users](https://supabase.com/dashboard/project/sjbnlggzvnvudxsytuyx/auth/users)에서 **Add user → Create new user**를 선택합니다. 기존 개인 이메일 계정을 편집하지 마세요.
+2. Email에는 **`admin@studyaide.vercel.app`**, Password에는 **이 사이트에서만 쓸 새 비밀번호**를 입력합니다. 12자 이상의 고유한 비밀번호를 권장합니다. **Auto Confirm User**를 켜고 생성하세요. 이 주소는 인증 식별자로만 사용하므로 초대 메일을 보내는 Invite user 방식은 사용하지 않습니다.
+3. 방금 직접 생성한 사용자의 **User UID(UUID)**를 복사합니다. [`admin-portal-access.sql`](admin-portal-access.sql)의 `PASTE_CREATED_USER_UUID_HERE`만 그 UUID로 바꾼 뒤 [SQL Editor](https://supabase.com/dashboard/project/sjbnlggzvnvudxsytuyx/sql/new)에서 전체를 실행합니다. 비밀번호를 SQL에 넣을 필요가 없으며, 확인된 전용 계정 한 개에만 조회 권한을 부여합니다. 기존 운영진 계정은 유지하고 재실행해도 중복되지 않습니다.
+4. [관리자 페이지](https://studyaide.vercel.app/admin/)에서 방금 정한 **전용 비밀번호만** 입력합니다. 이전 로그인 세션이 남아 있으면 먼저 로그아웃하세요.
 
-생성한 운영진 사용자 UUID를 아래 SQL에 넣어 SQL Editor에서 실행합니다.
+비밀번호를 채팅, GitHub 파일, 프론트엔드 환경변수에 넣지 마세요. 전용 계정이 이미 존재하면 본인이 만든 계정인지 확인하고 비밀번호와 권한을 관리하세요. 출처가 불분명한 계정에는 권한을 주지 마세요. 잊어버렸을 때 이 주소로 재설정 메일을 보내지 말고, 프로젝트 소유자가 Supabase 관리자 기능으로 전용 계정의 비밀번호를 재설정하세요.
 
-```sql
-insert into public.application_admins (user_id)
-values ('운영진-사용자의-UUID');
-```
+공개 회원 가입은 필요하지 않으므로 Supabase Authentication 설정의 **Allow new users to sign up**을 비활성화하세요. 비밀번호 대조, 세션 발급·갱신, 반복 인증 요청 제한은 Supabase Auth가 담당합니다. 클라이언트가 성공 화면을 임의로 표시하더라도 RLS 권한 없이는 지원자 정보를 읽을 수 없습니다. Rate limit 응답은 화면에서 대기 안내로 표시합니다.
+
+이 설정은 **Supabase Auth 계정을 분리**하는 방식입니다. 개인 이메일 계정, 해당 계정의 비밀번호, 신청 데이터와 접수 함수는 수정하지 않습니다. 전용 계정 생성 및 위 권한 SQL 실행을 마쳐야 실제 비밀번호 전용 로그인이 작동합니다.
 
 ## 3. 공개 연결 값
 

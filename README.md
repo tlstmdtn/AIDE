@@ -32,7 +32,7 @@ npm test
 1. Vercel에서 **Add New → Project**를 열고 GitHub 저장소 **tlstmdtn/AIDE**를 Import합니다.
 2. 프로젝트 이름을 **studyaide**, Production Branch를 **main**, Root Directory를 저장소 루트로 설정합니다. Framework Preset은 **Vite**입니다.
 3. **Deploy** 후 Settings → Domains에서 **studyaide.vercel.app**이 할당되었는지 확인합니다. 이미 다른 프로젝트가 사용하는 주소라면 해당 주소를 바로 사용할 수 없습니다.
-4. `/`, `/apply/`, `/admin/` 직접 방문·새로고침, 신청 접수와 운영진 로그인을 확인합니다. 로그인은 기존 Supabase 이메일·비밀번호 인증을 사용합니다.
+4. `/`, `/apply/`, `/admin/` 직접 방문·새로고침, 신청 접수와 운영진 로그인을 확인합니다. 관리자 전용 비밀번호 로그인은 별도의 Supabase Auth 계정과 RLS를 사용합니다. 최초 계정 생성 및 권한 설정은 아래 Supabase 안내를 따르세요.
 
 현재 사이트는 CLI로 배포되었습니다. GitHub 자동 배포는 Vercel 계정에 GitHub Login Connection을 추가한 뒤 `vercel git connect https://github.com/tlstmdtn/AIDE.git`로 연결해야 합니다. 기존 시도는 Login Connection이 없어 거절되었으며, 자동 배포 연결 완료로 표시하지 않습니다. CLI에서 진행하려면 Vercel 인증과 API 접근이 필요합니다. 토큰을 GitHub 파일이나 프론트엔드 환경변수에 넣지 마세요.
 
@@ -62,9 +62,9 @@ VITE_BASE_PATH=/AIDE/ npm run preview
 - 스크롤 진입 애니메이션과 부유 모션; 기기의 모션 감소 설정 지원
 - 키보드로 조작 가능한 커리큘럼 탭, FAQ, 포커스가 유지되는 모달
 - 별도 `/apply/` 페이지의 3단계 신청 양식과 실제 서버 접수 확인
-- `/admin/`의 이메일·비밀번호 운영진 로그인, 접수 시간·전체 답변 표, 검색·기간·AI 필터, 엑셀 다운로드
+- `/admin/`의 관리자 전용 비밀번호 로그인, 접수 시간·전체 답변 표, 검색·기간·AI 필터, 엑셀 다운로드
 - 신청 페이지 상단 중앙 AIDE 로고 5번 클릭 시 관리자 로그인 페이지로 이동
-- Supabase Auth + Postgres RLS: 운영진만 신청 내역 읽기 가능
+- Supabase Auth 전용 계정 + Postgres RLS: 개인 이메일 비밀번호와 분리하고 운영진만 신청 내역 읽기 가능
 - 신청·관리자 화면: `src/pages/`, `src/admissions.css`
 - 데이터 접근과 엑셀: `src/lib/admissions.js`
 - 주요 콘텐츠와 인터랙션: `src/main.jsx`
